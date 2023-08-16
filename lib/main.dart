@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nordine_app/success_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,6 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData.dark(
         // This is the theme of your application.
@@ -58,20 +60,34 @@ class _MyHomePageState extends State<MyHomePage>
   late AnimationController animationController;
 
   bool isBombExploded = false;
+  bool isBombDefused = false;
+  String secretCode = 'Nemesis';
+  // global key for the form
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // text editing controller for the text field
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+
     animationController = AnimationController(
       duration: const Duration(minutes: 3),
       vsync: this,
-    )..forward();
+    );
+    animationController.reverse(from: 1);
 
     animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         print('completed');
       }
     });
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -95,22 +111,10 @@ class _MyHomePageState extends State<MyHomePage>
               ),
             ),
             // linear progress indicator with a fixed color
+
             Container(
               margin: const EdgeInsets.all(8),
-              child: AnimatedBuilder(
-                animation: animationController,
-                builder: (context, child) {
-                  print(animationController.value);
-                  return LinearProgressIndicator(
-                    color: Theme.of(context).colorScheme.primary,
-                    minHeight: 10,
-                    value: animationController.value,
-                  );
-                },
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.all(8),
+              height: 100,
               child: AnimatedBuilder(
                 animation: animationController,
                 builder: (context, child) {
@@ -125,6 +129,159 @@ class _MyHomePageState extends State<MyHomePage>
                     ),
                   );
                 },
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(8),
+              child: AnimatedBuilder(
+                animation: animationController,
+                builder: (context, child) {
+                  return LinearProgressIndicator(
+                    color: Theme.of(context).colorScheme.primary,
+                    minHeight: 10,
+                    value: 1 - animationController.value,
+                  );
+                },
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(8),
+              child: Form(
+                key: _formKey,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _textEditingController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          hintText: 'Entrez le code secret',
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    IconButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.green,
+                        ),
+                        foregroundColor: MaterialStateProperty.all<Color>(
+                          Colors.white,
+                        ),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18.0),
+                          ),
+                        ),
+                        fixedSize: MaterialStateProperty.all<Size>(
+                          Size(60, 60),
+                        ),
+                        alignment: Alignment.center,
+                      ),
+                      onPressed: () {
+                        if (_textEditingController.text.isEmpty) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                icon: Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                  size: 150,
+                                ),
+                                contentTextStyle: TextStyle(
+                                  color: Colors.red,
+                                ),
+                                content: Text(
+                                  'Veuillez entrer un code',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else {
+                          if (_textEditingController.text == secretCode) {
+                            setState(() {
+                              isBombDefused = true;
+                            });
+                            animationController.stop();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return SuccessScreen();
+                                },
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  icon: Icon(
+                                    Icons.error,
+                                    color: Colors.red,
+                                    size: 150,
+                                  ),
+                                  contentTextStyle: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                  content: Text(
+                                    'Mauvais code',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        }
+                      },
+                      icon: Icon(
+                        Icons.check,
+                        size: 40,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
