@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:nordine_app/success_screen.dart';
 import 'package:nordine_app/loose_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Necessary initialization for package:media_kit.
+  MediaKit.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   runApp(const MyApp());
 }
@@ -20,7 +26,10 @@ class MyApp extends StatelessWidget {
 
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home:
+      const MyHomePage(title: 'Flutter Demo Home Page'),
+
+
     );
   }
 }
@@ -37,6 +46,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   late AnimationController animationController;
+  late final player = Player();
+
 
   String secretCode = 'Nemesis';
   // global key for the form
@@ -47,6 +58,16 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
+   /* player.setPlaylistMode(PlaylistMode.loop);
+    player.setVolume(1.0);
+    player.open(Playlist([
+      Media('assets/videos/video-nordine.mp3')
+    ]));*/
+
+
+
+
+    print(player.state);
     animationController = AnimationController(
       duration: const Duration(minutes: 3),
       vsync: this,
@@ -63,6 +84,15 @@ class _MyHomePageState extends State<MyHomePage>
         );
       }
     });
+    player.open(Playlist([
+      Media('assets/videos/video-nordine.mp3')
+    ]));
+    player.setPlaylistMode(PlaylistMode.loop);
+    /*player.open(
+      Media('assets/videos/video-nordine.mp3')
+    );*/
+print('=' * 100);
+    print(player.state);
   }
 
   @override
@@ -74,11 +104,34 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body:Container(
+        width: MediaQuery.of(context).size.width,
+    height: MediaQuery.of(context).size.height,
+        child:
+      Stack(children:[
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+        child:
+            AspectRatio(
+        aspectRatio: 16 / 9,
+        child:
+        Image.asset('assets/videos/video-nordine.gif',
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          fit: BoxFit.fill,
+        ),
+      ),
+      ),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+        child:
+      Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Text(
+            const Text(
               'Vous avez 3 minutes pour désamorcer la bombe !',
               style: TextStyle(
                 fontSize: 20,
@@ -259,6 +312,106 @@ class _MyHomePageState extends State<MyHomePage>
           ],
         ),
       ),
+      ),
+
+    ],
+      ),
+      ),
     );
   }
 }
+
+/*
+
+import 'package:flutter/material.dart';
+
+// Make sure to add following packages to pubspec.yaml:
+// * media_kit
+// * media_kit_video
+// * media_kit_libs_video
+import 'package:media_kit/media_kit.dart';                      // Provides [Player], [Media], [Playlist] etc.
+*/
+/*
+import 'package:media_kit_video/media_kit_video.dart';          // Provides [VideoController] & [Video] etc.
+*//*
+
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Necessary initialization for package:media_kit.
+  MediaKit.ensureInitialized();
+  runApp(
+    const MaterialApp(
+      home: MyScreen(),
+    ),
+  );
+}
+
+class MyScreen extends StatefulWidget {
+  const MyScreen({Key? key}) : super(key: key);
+  @override
+  State<MyScreen> createState() => MyScreenState();
+}
+
+class MyScreenState extends State<MyScreen> {
+  // Create a [Player] to control playback.
+  late final player = Player();
+  // Create a [VideoController] to handle video output from [Player].
+*/
+/*
+  late final controller = VideoController(player);
+*//*
+
+
+  @override
+  void initState() {
+    super.initState();
+    // Play a [Media] or [Playlist].
+
+   player.open(Playlist([
+     Media('assets/videos/video-nordine.mp3')
+   ]));
+   player.setPlaylistMode(PlaylistMode.loop);
+   print(player.state);
+   */
+/*
+    player.playOrPause();
+    player.setPlaylistMode(PlaylistMode.loop);
+    player.setVolume(1.0);
+    player.open(Playlist([Media('assets/videos/video-nordine.mp3'), Media('assets/videos/video-nordine.mp3')]);*//*
+
+
+    */
+/*player.stream.playing.listen((event) {
+      print(event);
+
+      if(event == false){
+        player.play();
+      }
+    });*//*
+
+  }
+
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.width * 9.0 / 16.0,
+        // Use [Video] widget to display video output.
+*/
+/*
+        child: Video(controller: controller),
+*//*
+
+      ),
+    );
+  }
+
+}*/
